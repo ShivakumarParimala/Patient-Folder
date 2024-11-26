@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Data - Jessica Taylor</title>
+
+    <!-- Link to Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Patient Data for Jessica Taylor</h1>
+            <p>Blood Pressure Chart (Yearly)</p>
+        </header>
+
+        <main>
+            <div class="chart-container">
+                <!-- Blood Pressure Chart -->
+                <canvas id="bloodPressureChart" width="400" height="200"></canvas>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Coalition Technologies</p>
+        </footer>
+    </div>
+
+    <script>
+        // URL for the API (replace this URL with the actual API endpoint)
+        const apiUrl = 'https://api.coalitiontechnologies.com/patientdata'; // Replace with the correct API endpoint
+
+        // Fetch data from the API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Extract data for Jessica Taylor
+                const jessicaData = data.find(patient => patient.name === 'Jessica Taylor');
+
+                if (jessicaData) {
+                    // Extract blood pressure data
+                    const bloodPressureData = jessicaData.bloodPressure.map(record => ({
+                        year: record.year,
+                        value: record.value
+                    }));
+
+                    // Prepare labels (years) and data (blood pressure values)
+                    const years = bloodPressureData.map(item => item.year);
+                    const values = bloodPressureData.map(item => item.value);
+
+                    // Get the context for the chart
+                    const ctx = document.getElementById('bloodPressureChart').getContext('2d');
+
+                    // Create the chart using Chart.js
+                    new Chart(ctx, {
+                        type: 'line', // Line chart
+                        data: {
+                            labels: years, // X-axis labels: years
+                            datasets: [{
+                                label: 'Blood Pressure (mm Hg)',
+                                data: values, // Y-axis data: blood pressure values
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: 'Blood Pressure (mm Hg)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    alert('No data found for Jessica Taylor.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('Failed to load patient data.');
+            });
+    </script>
+</body>
+</html>
